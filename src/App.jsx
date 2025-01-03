@@ -1,5 +1,6 @@
 import "./App.css";
 import MovieCard from "./components/MovieCard";
+import Home from "./pages/Home";
 
 function App() {
   const moviesNumber = 1;
@@ -8,6 +9,7 @@ function App() {
   }
   return (
     <>
+      <Home />
       <MovieCard
         movie={{
           title: "Harry Potter and the Order of the Phoenix",
