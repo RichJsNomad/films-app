@@ -1,29 +1,17 @@
 import "./App.css";
 import MovieCard from "./components/MovieCard";
 import Home from "./pages/Home";
+import { Routes, Route } from "react-router-dom";
+import Favourites from "./pages/Favourites";
 
 function App() {
-  const moviesNumber = 1;
-
-  if (moviesNumber) {
-  }
   return (
-    <>
-      <Home />
-      <MovieCard
-        movie={{
-          title: "Harry Potter and the Order of the Phoenix",
-          release_date: "2005",
-        }}
-      />
-
-      <MovieCard
-        movie={{
-          title: "Harry Potter and the Chamber of secrets",
-          release_date: "2002",
-        }}
-      />
-    </>
+    <main className="main-content">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/favourites" element={<Favourites />} />
+      </Routes>
+    </main>
   );
 }
 
