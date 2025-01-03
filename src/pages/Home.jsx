@@ -1,40 +1,55 @@
 import React from "react";
 import MovieCard from "../components/MovieCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../css/Home.css";
+import { searchMovies, getPopularMovies } from "../services/api";
 function Home() {
-  const [searchQuery, setSearchQuery] = useState();
-  const movies = [
-    {
-      id: 1,
-      title: "Harry Potter and the Philosopher's stone",
-      release: "2001",
-    },
-    {
-      id: 2,
-      title: "Harry Potter and the Prisoner of Azkaban",
-      release: "2003",
-    },
-    {
-      id: 3,
-      title: "Harry Potter and the Goblet of fire",
-      release: "2004",
-    },
-    {
-      id: 4,
-      title: "Harry Potter and the Order of of the Phoenix",
-      release: "2005",
-    },
-  ];
+  const [searchQuery, setSearchQuery] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleSearch = (e) => {
+  useEffect(() => {
+    const loadPopularMovies = async () => {
+      try {
+        const popularMovies = await getPopularMovies();
+        setMovies(popularMovies);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPopularMovies();
+  }, []);
+
+  const handleSearch = async (e) => {
     e.preventDefault();
-    alert(searchQuery);
+    if (!searchQuery.trim()) {
+      return;
+    }
+    if (loading) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const searchResults = await searchMovies(searchQuery);
+      setMovies(searchResults);
+      setError(null);
+    } catch (err) {
+      console.log(err);
+      setError("Failed to search movies");
+    } finally {
+      setLoading(false);
+    }
+    setSearchQuery("");
   };
   return (
     <div className="home">
       <form onSubmit={handleSearch} className="search-form" action="">
         <input
+          className="search-input"
           type="text"
           placeholder="Search for movies..."
           value={searchQuery}
@@ -44,15 +59,20 @@ function Home() {
           Search
         </button>
       </form>
+      {error && <div className="error-message">{error}</div>}
 
-      <div className="movies-grid">
-        {movies.map(
-          (movie) =>
-            movie.title.toLowerCase().startsWith(searchQuery) && (
-              <MovieCard movie={movie} key={movie.id} />
-            )
-        )}
-      </div>
+      {loading ? (
+        <div className="loading">Loading...</div>
+      ) : (
+        <div className="movies-grid">
+          {movies.map(
+            (movie) =>
+              movie.title.toLowerCase().startsWith(searchQuery) && (
+                <MovieCard movie={movie} key={movie.id} />
+              )
+          )}
+        </div>
+      )}
     </div>
   );
 }
